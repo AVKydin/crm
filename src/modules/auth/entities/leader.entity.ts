@@ -2,6 +2,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { HydratedDocument } from 'mongoose';
 
+import { ERole } from '../../../common/enum /role.enum';
+
 export type LeaderDocument = HydratedDocument<Leader>;
 
 @Schema()
@@ -13,6 +15,9 @@ export class Leader {
   @ApiProperty({ description: 'Email', example: 'maks@gmail.com' })
   @Prop({ required: true, unique: true })
   email: string;
+
+  @Prop({ type: String, enum: Object.values(ERole), required: true })
+  role: ERole;
 
   @ApiProperty({ description: 'Password hash', example: 'UserPassword' })
   @Prop({ required: true })

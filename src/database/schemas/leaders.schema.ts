@@ -20,6 +20,14 @@ export class Leaders {
     maxlength: 16,
     minlength: 2,
   })
+  role: string;
+
+  @Prop({
+    trim: true,
+    require: true,
+    maxlength: 16,
+    minlength: 2,
+  })
   surname: string;
 
   @Prop({

@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
 
+import { ERole } from '../../common/enum /role.enum';
 import { AuthCreateUserDto } from './dto/auth-create-user.dto';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { Leader, LeaderDocument } from './entities/leader.entity';
@@ -30,11 +31,12 @@ export class AuthService {
     const newUser = await this.leaderModel.create({
       username: username,
       email: email,
+      role: ERole.MANAGER,
       password: hashPassword,
     });
     const tokens = await this.generateTokens(
       newUser.id,
-      newUser.email,
+      newUser.role,
       newUser.username,
     );
     await this.updateRefreshTokenHash(newUser.id, tokens.refreshToken);
@@ -53,11 +55,7 @@ export class AuthService {
         'Leader with this credentials was not found!',
         HttpStatus.NOT_FOUND,
       );
-    const tokens = await this.generateTokens(
-      user.id,
-      user.email,
-      user.username,
-    );
+    const tokens = await this.generateTokens(user.id, user.role, user.username);
     await this.updateRefreshTokenHash(user.id, tokens.refreshToken);
     return tokens;
   }
@@ -83,11 +81,7 @@ export class AuthService {
     if (!user || !user.hashedRefreshToken || !refreshTokenMatches) {
       throw new HttpException('Access denied!', HttpStatus.FORBIDDEN);
     }
-    const tokens = await this.generateTokens(
-      user.id,
-      user.email,
-      user.username,
-    );
+    const tokens = await this.generateTokens(user.id, user.role, user.username);
     await this.updateRefreshTokenHash(user.id, tokens.refreshToken);
     return tokens;
   }
@@ -110,13 +104,13 @@ export class AuthService {
 
   async generateTokens(
     userId: string,
-    email: string,
+    role: string,
     username: string,
   ): Promise<Tokens> {
     const accessToken = await this.jwtService.signAsync(
       {
         userId,
-        email,
+        role,
         username,
       },
       {
@@ -128,7 +122,7 @@ export class AuthService {
     const refreshToken = await this.jwtService.signAsync(
       {
         userId,
-        email,
+        role,
         username,
       },
       {

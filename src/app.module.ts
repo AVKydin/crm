@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { AuthModule } from './modules/auth/auth.module';
-import { LeadersModule } from './modules/leaders/leaders.module';
+import { AdminModule } from './modules/leaders/admin/admin.module';
 import { StudentsModule } from './modules/students/students.module';
 
 @Module({
@@ -15,7 +15,7 @@ import { StudentsModule } from './modules/students/students.module';
     MongooseModule.forRoot(process.env.DB_HOST),
     StudentsModule,
     AuthModule,
-    LeadersModule,
+    AdminModule,
   ],
   controllers: [],
   providers: [],
